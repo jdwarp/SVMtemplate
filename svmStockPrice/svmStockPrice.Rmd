@@ -1,7 +1,7 @@
 ---
 title: "SVM project"
-author: "MGMT6770"
-date: "9/23/2019"
+author: "Jaime Duran"
+date: "11/1/2019"
 output: 
   html_document:
     toc: true
@@ -22,20 +22,21 @@ library(e1071)
 ```
 
 ## get data:
+price.open	price.high	price.low	price.close	volume	price.adjusted	ret.adjusted.prices	ret.closing.prices	avgChange	Change
 
 ```{r}
-slpData = read.csv('SLPtrimmed.csv')
-attach(slpData)
+tysonData = read.csv('tyson15.csv')
+attach(tysonData)
 # set up data frame
-slpDataFrame = data.frame(open=price.open, high=price.high,
-        low=price.low, close=price.adjusted,volume= volume/10000, avg_change=avg_change, change = changeCategory )
-head(slpDataFrame)
-remove(slpData)
+tysonDataFrame = data.frame(open=price.open, high=price.high,
+        low=price.low, close=price.adjusted,volume= volume/10000, avg_change=avgChange, change = Change )
+head(tysonDataFrame)
+remove(tysonData)
 
 ```
 
 ```{r}
-plot(slpDataFrame)
+plot(tysonDataFrame)
 ```
 
 
@@ -43,8 +44,8 @@ plot(slpDataFrame)
 
 ### traditional interface:
 ```{r}
-x <- subset(slpDataFrame, select = -change)
-y <- slpDataFrame$change
+x <- subset(tysonDataFrame, select = -change)
+y <- tysonDataFrame$change
 model1 <- svm(x, y) 
 
 print(model1)
@@ -70,8 +71,8 @@ pred <- predict(model1, x, decision.values = TRUE)
 attr(pred, "decision.values")[1:6,]
 
 # visualize (classes by color, SV by crosses):
-plot(cmdscale(dist(slpDataFrame[,-7])),
-     col = as.integer(slpDataFrame[,7]),xlab="normalized X", ylab = "$ change",
+plot(cmdscale(dist(tysonDataFrame[,-7])),
+     col = as.integer(tysonDataFrame[,7]),xlab="normalized X", ylab = "$ change",
      pch = c("o","+")[1:150 %in% model1$index + 1])
 legend('bottomleft',c('data','prediction'),pch=c('0','+'))
 grid()
@@ -97,8 +98,8 @@ TrainSetIndex = 1:nTrain
 ```{r}
 # first the training set
 
-XtrainSet = slpDataFrame[TrainSetIndex,-7]
-YtrainSet = slpDataFrame$change[TrainSetIndex]
+XtrainSet = tysonDataFrame[TrainSetIndex,-7]
+YtrainSet = tysonDataFrame$change[TrainSetIndex]
 ```
 
 ## get the model from training set.. 
@@ -113,8 +114,8 @@ summary(model2)
 ## now the test set.. 
 
 ```{r}
-XtestSet = slpDataFrame[(nTrain:nObs),-7]
-YtestSet = slpDataFrame$change[nTrain:nObs]
+XtestSet = tysonDataFrame[(nTrain:nObs),-7]
+YtestSet = tysonDataFrame$change[nTrain:nObs]
 ```
 
 ## and evaluate with the test data
